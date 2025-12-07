@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CTIP v3.0 Scan Report</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 40px; 
+            background: #f8f9fa; 
+            color: #333;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #4a6fa5; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #2c3e50; 
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .header h3 { 
+            color: #7f8c8d; 
+            font-weight: normal;
+        }
+        .summary { 
+            display: flex; 
+            justify-content: space-around; 
+            margin: 30px 0; 
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .summary-box { 
+            text-align: center; 
+            padding: 25px; 
+            border-radius: 10px; 
+            width: 22%; 
+            min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+        .summary-box:hover { 
+            transform: translateY(-5px);
+        }
+        .malicious-box { 
+            background: linear-gradient(135deg, #ff6b6b, #ff5252); 
+            border: 2px solid #ff4444; 
+            color: white;
+        }
+        .suspicious-box { 
+            background: linear-gradient(135deg, #ffd93d, #ffc107); 
+            border: 2px solid #ffb300; 
+            color: #333;
+        }
+        .clean-box { 
+            background: linear-gradient(135deg, #51cf66, #40c057); 
+            border: 2px solid #37b24d; 
+            color: white;
+        }
+        .total-box { 
+            background: linear-gradient(135deg, #4d96ff, #339af0); 
+            border: 2px solid #228be6; 
+            color: white;
+        }
+        .summary-number { 
+            font-size: 2.8em; 
+            font-weight: bold; 
+            margin: 10px 0; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .file-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .file-table th { 
+            background: #4a6fa5; 
+            color: white;
+            padding: 15px; 
+            text-align: left; 
+            border-bottom: 3px solid #3a5a80;
+            font-weight: 600;
+        }
+        .file-table td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e9ecef; 
+            vertical-align: top;
+        }
+        .malicious-row { 
+            background: #fff5f5; 
+            border-left: 4px solid #ff6b6b;
+        }
+        .suspicious-row { 
+            background: #fff9db; 
+            border-left: 4px solid #ffd93d;
+        }
+        .clean-row { 
+            background: #ebfbee; 
+            border-left: 4px solid #51cf66;
+        }
+        .status { 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 0.9em;
+            display: inline-block;
+        }
+        .status-malicious { 
+            background: #ff6b6b; 
+            color: white;
+        }
+        .status-suspicious { 
+            background: #ffd93d; 
+            color: #333;
+        }
+        .status-clean { 
+            background: #51cf66; 
+            color: white;
+        }
+        .details-toggle {
+            cursor: pointer;
+            color: #4a6fa5;
+            font-size: 0.9em;
+            margin-left: 10px;
+            text-decoration: underline;
+        }
+        .details-toggle:hover {
+            color: #2c4a70;
+        }
+        .details-content {
+            display: none;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+        .timestamp { 
+            color: #7f8c8d; 
+            font-size: 0.9em; 
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .summary-box { width: 100%; }
+            body { margin: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 CTIP v3.0 Scan Report</h1>
+            <h3>Cryptographic Threat Intelligence Platform</h3>
+            <p>Generated: 2025-12-07T23:30:13.771669</p>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-box total-box">
+                <div class="summary-number">7</div>
+                <div>Total Files</div>
+            </div>
+            <div class="summary-box malicious-box">
+                <div class="summary-number">4</div>
+                <div>Malicious</div>
+            </div>
+            <div class="summary-box suspicious-box">
+                <div class="summary-number">0</div>
+                <div>Suspicious</div>
+            </div>
+            <div class="summary-box clean-box">
+                <div class="summary-number">3</div>
+                <div>Clean</div>
+            </div>
+        </div>
+        
+        <table class="file-table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Status</th>
+                    <th>Threat Score</th>
+                    <th>VirusTotal</th>
+                    <th>YARA</th>
+                    <th>Entropy</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr class="clean-row">
+                <td>test1.txt</td>
+                <td><span class="status status-clean">CLEAN</span></td>
+                <td><strong>0.17/1.0</strong></td>
+                <td>✅</td>
+                <td>🔍 1</td>
+                <td>📝 3.8</td>
+                <td>
+                    <span onclick="toggleDetails('details-0')" class="details-toggle">Show Details</span>
+                    <div id="details-0" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="malicious-row">
+                <td>eicar.com</td>
+                <td><span class="status status-malicious">MALICIOUS</span></td>
+                <td><strong>1.0/1.0</strong></td>
+                <td>🚨 54</td>
+                <td>🔍 2</td>
+                <td>📝 4.9</td>
+                <td>
+                    <span onclick="toggleDetails('details-1')" class="details-toggle">Show Details</span>
+                    <div id="details-1" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>VirusTotal: 54 engines detected as malicious</li><li style='margin:3px 0;'>Signature: 1 high severity rule(s): eicar</li><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="malicious-row">
+                <td>random.bin</td>
+                <td><span class="status status-malicious">MALICIOUS</span></td>
+                <td><strong>0.77/1.0</strong></td>
+                <td>✅</td>
+                <td>🔍 1</td>
+                <td>🔒 7.8</td>
+                <td>
+                    <span onclick="toggleDetails('details-2')" class="details-toggle">Show Details</span>
+                    <div id="details-2" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li><li style='margin:3px 0;'>Behavior: High entropy (7.83) - possible encryption detected</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="malicious-row">
+                <td>eicar_large.txt</td>
+                <td><span class="status status-malicious">MALICIOUS</span></td>
+                <td><strong>0.87/1.0</strong></td>
+                <td>✅</td>
+                <td>🔍 2</td>
+                <td>📝 5.3</td>
+                <td>
+                    <span onclick="toggleDetails('details-3')" class="details-toggle">Show Details</span>
+                    <div id="details-3" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>Signature: 1 high severity rule(s): eicar</li><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="malicious-row">
+                <td>encrypted_large.bin</td>
+                <td><span class="status status-malicious">MALICIOUS</span></td>
+                <td><strong>0.77/1.0</strong></td>
+                <td>✅</td>
+                <td>🔍 1</td>
+                <td>🔒 7.9</td>
+                <td>
+                    <span onclick="toggleDetails('details-4')" class="details-toggle">Show Details</span>
+                    <div id="details-4" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li><li style='margin:3px 0;'>Behavior: High entropy (7.92) - possible encryption detected</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="clean-row">
+                <td>test_large.txt</td>
+                <td><span class="status status-clean">CLEAN</span></td>
+                <td><strong>0.17/1.0</strong></td>
+                <td>✅</td>
+                <td>🔍 1</td>
+                <td>📝 4.1</td>
+                <td>
+                    <span onclick="toggleDetails('details-5')" class="details-toggle">Show Details</span>
+                    <div id="details-5" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        <ul style='margin:5px 0; padding-left:20px;'><li style='margin:3px 0;'>Signature: 1 medium severity rule(s) matched</li></ul>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="clean-row">
+                <td>test_new_feature.txt</td>
+                <td><span class="status status-clean">CLEAN</span></td>
+                <td><strong>0.0/1.0</strong></td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>📝 0.0</td>
+                <td>
+                    <span onclick="toggleDetails('details-6')" class="details-toggle">Show Details</span>
+                    <div id="details-6" class="details-content">
+                        <strong>Indicators:</strong><br>
+                        No indicators
+                    </div>
+                </td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+        <div class="timestamp">
+            Report generated by CTIP v3.0 - Advanced Threat Detection System
+        </div>
+    </div>
+    
+    <script>
+        function toggleDetails(id) {
+            var element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
+        
