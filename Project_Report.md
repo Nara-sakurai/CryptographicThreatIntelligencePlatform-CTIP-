@@ -4,8 +4,8 @@
 
 **Course:** Cryptography & Network Security  
 **Academic Year:** 2024-2025  
-**Student Name:** [Your Name]  
-**Student ID:** [Your ID]  
+**Student Name:**  
+**Student ID:**  
 **Submission Date:** December 10, 2024  
 **Version:** v1.0-final
 
