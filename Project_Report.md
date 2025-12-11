@@ -132,8 +132,8 @@ The project applies several cryptographic and security concepts:
        └─────────┬──────────┘
                  │
        ┌─────────▼──────────────────────────────────────┐
-       │         Parallel Detection Pipeline             │
-       │                                                 │
+       │         Parallel Detection Pipeline            │
+       │                                                │
        │  ┌────────────┐  ┌──────────┐  ┌────────────┐ │
        │  │   Hash     │  │ YARA     │  │  Entropy   │ │
        │  │  Checker   │  │ Scanner  │  │  Detector  │ │
@@ -232,17 +232,17 @@ src/
 │   ├── calculate_hashes()│
 │   ├── check_virustotal()│
 │   └── get_file_hashes() │
-│                          │
+│                         │
 ├── signature_scanner.py ─┤
 │   ├── load_rules()      │
 │   ├── compile_rules()   ├──► All feed into
 │   └── scan()            │    Classifier
-│                          │
+│                         │
 ├── entropy_detector.py ──┤
 │   ├── calculate_entropy()
 │   ├── interpret_entropy()
 │   └── analyze()         │
-│                          │
+│                         │
 └── classifier.py ◄───────┘
     ├── check_virustotal()
     ├── check_signatures()
@@ -281,7 +281,7 @@ src/
                    ┌───────▼────────────────┐
                    │ Calculate Shannon      │
                    │ Entropy:               │
-                   │ H = -Σ P(i)*log₂P(i)  │
+                   │ H = -Σ P(i)*log₂P(i)   │
                    └───────┬────────────────┘
                            │
                    ┌───────▼────────┐
