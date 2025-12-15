@@ -134,13 +134,13 @@ The project applies several cryptographic and security concepts:
        ┌─────────▼──────────────────────────────────────┐
        │         Parallel Detection Pipeline            │
        │                                                │
-       │  ┌────────────┐  ┌──────────┐  ┌────────────┐ │
-       │  │   Hash     │  │ YARA     │  │  Entropy   │ │
-       │  │  Checker   │  │ Scanner  │  │  Detector  │ │
-       │  │            │  │          │  │            │ │
-       │  │VirusTotal  │  │ 446      │  │ Shannon    │ │
-       │  │   API      │  │ Rules    │  │ Analysis   │ │
-       │  └─────┬──────┘  └────┬─────┘  └──────┬─────┘ │
+       │  ┌────────────┐  ┌──────────┐  ┌────────────┐  │
+       │  │   Hash     │  │ YARA     │  │  Entropy   │  │
+       │  │  Checker   │  │ Scanner  │  │  Detector  │  │
+       │  │            │  │          │  │            │  │
+       │  │VirusTotal  │  │ 446      │  │ Shannon    │  │
+       │  │   API      │  │ Rules    │  │ Analysis   │  │
+       │  └─────┬──────┘  └────┬─────┘  └──────┬─────┘  │
        └────────┼──────────────┼────────────────┼───────┘
                 │              │                │
                 └──────────────┼────────────────┘
