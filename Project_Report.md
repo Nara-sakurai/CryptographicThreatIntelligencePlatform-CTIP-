@@ -1456,6 +1456,6 @@ rule High_Entropy_Section {
 
 **End of Report**
 
-**Project Repository:** https://github.com/yourusername/CTIP  
+**Project Repository:** https://github.com/Nara-sakurai/CryptographicThreatIntelligencePlatform-CTIP-/edit/main/Project_Report.md
 **Version:** v1.0-final  
-**Submission Date:** December 10, 2024
+**Submission Date:** December 10, 2025
