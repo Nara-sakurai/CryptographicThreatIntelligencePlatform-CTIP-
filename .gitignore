@@ -1,7 +1,12 @@
+# CTIP - Cryptographic Threat Intelligence Platform
+# .gitignore
+
+# ============================================
 # Python
+# ============================================
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .Python
 build/
@@ -16,26 +21,133 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
+# ============================================
 # Virtual Environment
+# ============================================
 venv/
 env/
+ENV/
+env.bak/
+venv.bak/
 
-# IDE
+# ============================================
+# IDE & Editors
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.pydevproject
+.settings/
 
-# Environment variables
+# ============================================
+# Environment Variables (IMPORTANT!)
+# ============================================
 .env
+.env.local
+.env.*.local
 
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+
+# ============================================
 # Database
+# ============================================
 *.db
+*.sqlite
 *.sqlite3
 
-# Logs
-*.log
+# ============================================
+# Reports (Generated Files)
+# ============================================
+*.html
+*.csv
+*.json
+!requirements.txt
+!package.json
+
+# Exclude generated reports but keep sample reports
+reports/
+results/
+output/
+scan_results/
+
+# ============================================
+# YARA Compiled Rules (Optional)
+# ============================================
+# Uncomment if you compile YARA rules to .yarc
+# *.yarc
+
+# ============================================
+# Test Samples (Optional - Keep for demo)
+# ============================================
+# Uncomment these if you don't want to commit test files
+# samples/suspicious/*.exe
+# samples/suspicious/*.dll
+# samples/suspicious/*.bin
+
+# But keep EICAR for demonstration
+!samples/eicar.com
+!samples/eicar_large.txt
+
+# ============================================
+# OS Files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ============================================
+# Coverage Reports
+# ============================================
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# ============================================
+# Documentation Builds
+# ============================================
+docs/_build/
+site/
+
+# ============================================
+# Personal Notes (Optional)
+# ============================================
+notes.md
+TODO.md
+NOTES.txt
+personal/
