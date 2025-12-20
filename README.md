@@ -409,17 +409,4 @@ This project demonstrates:
 - **Rich Library** - For beautiful terminal output
 - **Open Source Community** - For YARA rule contributions
 
-## 📚 References
-
-1. YARA Documentation: 
-	https://yara.readthedocs.io/
-	https://github.com/Yara-Rules/rules/
-2. VirusTotal API: 
-	https://developers.virustotal.com/
-	https://docs.virustotal.com/reference/overview
-3. Shannon Entropy: 
-	https://en.wikipedia.org/wiki/Entropy_(information_theory)
-4. Malware Analysis Techniques
-	https://malware.news/
-
 
