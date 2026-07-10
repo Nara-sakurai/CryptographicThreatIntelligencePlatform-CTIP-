@@ -14,60 +14,64 @@ load_dotenv()
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from hash_checker import HashChecker
-from signature_scanner import SignatureScanner
-from entropy_detector import EntropyDetector
-from classifier import ThreatClassifier
+from scanner import Scanner
 from display import Display
 from reporter import ReportGenerator
 
 
 class CTIP:
-    """Main scanner class that coordinates all detection methods"""
-    
-    def __init__(self):
-        self.hash_checker = HashChecker()
-        self.signature_scanner = SignatureScanner()
-        self.entropy_detector = EntropyDetector()
-        self.classifier = ThreatClassifier()
+    """Main scanner class that coordinates all detection methods.
+
+    Detection logic lives in the shared Scanner core (src/scanner.py);
+    this class keeps the CLI's familiar output and reporting behaviour
+    on top of that same logic.
+    """
+
+    def __init__(self, rules_path=None):
+        # Shared, print-free scan core. The progress callback reproduces the
+        # CLI's original stage-by-stage output, in the original order.
+        self.scanner = Scanner(
+            rules_path=rules_path,
+            include_virustotal=True,
+            on_progress=self._print_stage,
+        )
         self.display = Display()
         self.reporter = ReportGenerator()
+
+    def _print_stage(self, stage):
+        """Reproduce the original CLI progress lines for each scan stage."""
+        if stage == "hash":
+            print("  1️⃣  Checking hash with VirusTotal...")
+        elif stage == "signature":
+            print("  2️⃣  Scanning for malware signatures...")
+        elif stage == "entropy":
+            print("  3️⃣  Analyzing file behavior (entropy)...")
     
     def scan_file(self, filepath):
         """Scan a single file using all detection methods"""
         if not Path(filepath).exists():
             print(f"❌ File not found: {filepath}")
             return None
-        
+
         print(f"\n{'='*60}")
         print(f"🔍 Scanning: {filepath}")
         print(f"{'='*60}")
-        
-        # Run all 3 detection methods
-        print("  1️⃣  Checking hash with VirusTotal...")
-        vt_data = self.hash_checker.get_file_hashes(filepath)
-        
-        print("  2️⃣  Scanning for malware signatures...")
-        yara_data = self.signature_scanner.scan(filepath)
-        
-        print("  3️⃣  Analyzing file behavior (entropy)...")
-        entropy_data = self.entropy_detector.analyze(filepath)
-        
-        # Combine all results and classify threat level
-        classification = self.classifier.classify(filepath, vt_data, yara_data, entropy_data)
-        
-        # Display results nicely
-        self.display.show(filepath, vt_data, yara_data, entropy_data, classification)
-        
-        # Return complete scan result
-        return {
-            "filepath": filepath,
-            "vt_data": vt_data,
-            "yara_data": yara_data,
-            "entropy_data": entropy_data,
-            "classification": classification,
-            "timestamp": datetime.now().isoformat()
-        }
+
+        # Delegate the detection pipeline to the shared Scanner core.
+        # The on_progress callback prints the original 1️⃣/2️⃣/3️⃣ stage lines.
+        result = self.scanner.scan_file(filepath)
+        if not result:
+            return None
+
+        # Display results nicely (CLI-only concern)
+        self.display.show(
+            filepath,
+            result.get("vt_data"),
+            result.get("yara_data"),
+            result.get("entropy_data"),
+            result.get("classification"),
+        )
+        return result
     
     def scan_directory(self, directory_path, recursive=False, file_extensions=None):
         """Scan all files in a directory"""
@@ -160,6 +164,7 @@ Examples:
     parser.add_argument("--dir", "--directory", help="Scan a directory")
     parser.add_argument("--recursive", "-r", action="store_true", help="Scan directory recursively")
     parser.add_argument("--ext", "--extensions", help="File extensions to scan (comma-separated)")
+    parser.add_argument("--rules", help="Path to YARA rules file (.yar) or directory (default: auto-detected)")
     
     # Report options
     parser.add_argument("--report", help="Generate report file")
@@ -179,7 +184,7 @@ Examples:
         return 1
     
     # Initialize scanner
-    ctip = CTIP()
+    ctip = CTIP(rules_path=args.rules)
     results = []
     
     # Run scans

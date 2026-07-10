@@ -32,10 +32,19 @@ MANIFEST
 # Virtual Environment
 # ============================================
 venv/
+.venv/
 env/
 ENV/
 env.bak/
 venv.bak/
+
+# ============================================
+# Tooling / agent session data
+# ============================================
+.zcode/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # ============================================
 # IDE & Editors
@@ -77,6 +86,23 @@ logs/
 *.json
 !requirements.txt
 !package.json
+
+# Keep the web UI templates (otherwise caught by the *.html rule above)
+!templates/
+!templates/**
+
+# Exclude generated reports but keep sample reports
+reports/
+results/
+output/
+scan_results/
+
+# ============================================
+# Web UI uploads (NEVER commit uploaded samples)
+# ============================================
+# Ignore the contents but keep the empty directory via .gitkeep.
+uploads/*
+!uploads/.gitkeep
 
 # Exclude generated reports but keep sample reports
 reports/

@@ -10,22 +10,43 @@ import re
 class SignatureScanner:
     """Scans files for malware signatures using YARA rules"""
     
-    def __init__(self, rules_dir="all-yara-rules-database"):
-        self.rules_dir = Path(rules_dir)
+    def __init__(self, rules_path="all-yara-rules-database"):
+        # rules_path may be a single .yar file OR a directory of rules.
+        self.rules_dir = Path(rules_path) if str(rules_path).endswith((".yar", ".yara")) else Path(rules_path)
+        self.rules_source = Path(rules_path)
         self.rules = None
         self.rule_sources = {}  # Maps rule names to their source files
         self.loaded_file_count = 0
+        self.load_error = None  # human-readable reason when rules can't load
         
         print("🔍 Loading YARA malware signatures...")
         self.load_rules()
-    
+
     def load_rules(self):
-        """Load YARA rules from database"""
-        # Find all YARA files
-        all_files = list(self.rules_dir.rglob("*.yar"))
-        
+        """Load YARA rules from a single file or a directory database"""
+        source = self.rules_source
+
+        # Gracefully handle a missing rules path instead of crashing.
+        if not source.exists():
+            self.load_error = f"Rules path not found: {source}"
+            print(f"❌ {self.load_error}")
+            return
+
+        # Single-file mode: compile one .yar / .yara bundle directly.
+        if source.is_file():
+            if source.suffix.lower() not in (".yar", ".yara"):
+                self.load_error = f"Not a YARA file (.yar/.yara): {source}"
+                print(f"❌ {self.load_error}")
+                return
+            self.load_single_file(source)
+            return
+
+        # Directory mode (original behavior): discover and compile usable files.
+        all_files = list(source.rglob("*.yar"))
+
         if not all_files:
-            print("❌ No YARA files found in database")
+            self.load_error = f"No .yar files found in directory: {source}"
+            print(f"❌ {self.load_error}")
             return
         
         print(f"  Found {len(all_files)} .yar files in database")
@@ -105,7 +126,108 @@ class SignatureScanner:
             print(f"✅ Loaded {self.loaded_file_count} YARA rule files")
             
         except yara.Error as e:
-            print(f"❌ Compilation failed: {str(e)[:80]}")
+            self.load_error = f"YARA compilation failed: {str(e)[:120]}"
+            print(f"❌ {self.load_error}")
+
+    def load_single_file(self, yar_file):
+        """Compile a single .yar / .yara file into one or more namespaces.
+
+        Many bundled rule files are concatenations of originally separate
+        ``.yar`` files delimited by ``// Included from:`` / ``// End include:``
+        markers. Some of those units reference optional YARA modules (e.g.
+        ``cuckoo``) that are not compiled into this yara-python build, which
+        would make the *entire* bundle fail to compile. To stay robust we
+        compile each delimited unit independently and keep the ones that work,
+        mirroring how the directory loader already tolerates bad files.
+        """
+        try:
+            content = yar_file.read_text(encoding='utf-8', errors='ignore')
+        except Exception as e:
+            self.load_error = f"Could not read rules file: {e}"
+            print(f"❌ {self.load_error}")
+            return
+
+        units = self._split_bundle_units(content)
+        print(f"  Found {len(units)} rule unit(s) in {yar_file.name}")
+
+        rules_dict = {}
+        self.rule_sources = {}
+        kept = 0
+        skipped = 0
+
+        for i, (label, body) in enumerate(units):
+            body = self._strip_includes(body)
+            if not body.strip():
+                continue
+            namespace = f"{Path(yar_file).stem}_{i:04d}_{Path(label).stem}"
+            try:
+                yara.compile(source=body)
+            except Exception:
+                # Skip units that need modules we don't have or contain errors.
+                skipped += 1
+                continue
+            rules_dict[namespace] = body
+            kept += 1
+            for rule_name in self.extract_rule_names(body):
+                self.rule_sources[f"{namespace}.{rule_name}"] = {
+                    "file": yar_file.name,
+                    "category": Path(label).parts[0] if Path(label).parts else "bundle",
+                }
+
+        if not rules_dict:
+            self.load_error = f"No compilable rule units in {yar_file.name}"
+            print(f"❌ {self.load_error}")
+            return
+
+        try:
+            self.rules = yara.compile(sources=rules_dict)
+        except yara.Error as e:
+            self.load_error = f"YARA compilation failed: {str(e)[:120]}"
+            print(f"❌ {self.load_error}")
+            return
+
+        self.loaded_file_count = kept
+        print(f"  ✓ Usable units: {kept} (skipped {skipped})")
+        print(f"✅ Loaded YARA rules from {yar_file.name}")
+
+    @staticmethod
+    def _strip_includes(text):
+        """Remove ``include "..."`` directives that reference external files."""
+        lines = [ln for ln in text.split('\n') if not ln.strip().startswith('include "')]
+        return '\n'.join(lines)
+
+    def _split_bundle_units(self, content):
+        """Split a concatenated bundle into (label, body) units.
+
+        A bundle is a series of sections introduced by lines like::
+
+            // Included from: include "./malware/MALW_AZORULT.yar"
+            ... rules ...
+            // End include: include "./malware/MALW_AZORULT.yar"
+
+        If no markers are present the whole file is returned as one unit.
+        """
+        units = []
+        current_label = "root"
+        buffer = []
+
+        for line in content.split('\n'):
+            stripped = line.strip()
+            if stripped.startswith('// Included from:'):
+                # Flush any preceding content as a unit before starting a new one
+                if buffer and '\n'.join(buffer).strip():
+                    units.append((current_label, '\n'.join(buffer)))
+                buffer = []
+                # Extract a label like "./malware/MALW_AZORULT.yar"
+                marker = stripped.replace('// Included from:', '').strip()
+                current_label = marker.replace('include', '').strip().strip('"')
+            else:
+                buffer.append(line)
+
+        if buffer and '\n'.join(buffer).strip():
+            units.append((current_label, '\n'.join(buffer)))
+
+        return units
     
     def extract_rule_names(self, content):
         """Extract rule names from YARA content"""
@@ -148,7 +270,12 @@ class SignatureScanner:
                     meta_info = {}
                     if hasattr(match, 'meta') and match.meta:
                         meta_info = dict(match.meta)
-                    
+
+                    # Get tags (may be absent on some matches)
+                    tags = []
+                    if hasattr(match, 'tags') and match.tags:
+                        tags = list(match.tags)
+
                     # Determine severity
                     severity = self.determine_severity(rule_name, meta_info)
                     
@@ -157,6 +284,7 @@ class SignatureScanner:
                         "description": meta_info.get('description', rule_name),
                         "severity": meta_info.get('severity', severity),
                         "source": source_info["category"],
+                        "tags": tags,
                         "meta": meta_info
                     })
                 

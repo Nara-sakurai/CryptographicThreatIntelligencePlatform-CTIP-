@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TriFusion{% endblock %} &middot; Local YARA Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="brand">TriFusion</h1>
+            <p class="tagline">Local defensive YARA scanner</p>
+        </div>
+    </header>
+
+    <div class="banner" role="alert">
+        <strong>Safe sample handling:</strong>
+        This tool is for defensive, educational use only. It runs locally on
+        <code>127.0.0.1</code> and never executes or transmits files. Handle real
+        suspicious samples only inside an isolated VM/lab, and never upload real
+        malware to GitHub. See <strong>SECURITY.md</strong>.
+    </div>
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-list">
+                    {% for m in messages %}
+                        <li class="flash">{{ m }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>TriFusion &middot; Local YARA scanner &middot; CLI: <code>python main.py</code> &middot; Web: <code>python app.py</code></p>
+        </div>
+    </footer>
+</body>
+</html>

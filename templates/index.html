@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>Scan a file</h2>
+    <p class="muted">
+        Upload a file to scan it locally with YARA signatures, entropy
+        analysis, and hashing (SHA256/MD5). No file is ever executed or
+        transmitted.
+    </p>
+
+    <form method="post" action="{{ url_for('scan') }}" enctype="multipart/form-data">
+        <div class="field">
+            <label for="rules_path">YARA rules path</label>
+            <input type="text" id="rules_path" name="rules_path"
+                   value="{{ default_rules or '' }}"
+                   placeholder="e.g. expanded_database_rules.yar or all-yara-rules-database">
+            <small class="muted">Leave blank to auto-detect the default rules source.</small>
+        </div>
+
+        <div class="field">
+            <label for="sample_file">Sample file (max 16&nbsp;MB)</label>
+            <input type="file" id="sample_file" name="sample_file" required>
+        </div>
+
+        <div class="field field-check">
+            <label class="check">
+                <input type="checkbox" id="use_virustotal" name="use_virustotal">
+                <span>Look up the file's <strong>SHA256 hash</strong> on VirusTotal
+                      <span class="muted">(sends only the hash, never the file)</span></span>
+            </label>
+            {% if not vt_available %}
+                <small class="muted">
+                    Disabled: set <code>VIRUSTOTAL_API_KEY</code> in a local <code>.env</code>
+                    file to enable this option. The scan runs with local hashing only.
+                </small>
+            {% else %}
+                <small class="muted">
+                    Off by default. Enable only for files whose hash you are willing to
+                    share with a third party.
+                </small>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn">Scan</button>
+    </form>
+</section>
+{% endblock %}

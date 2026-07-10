@@ -1,4 +1,11 @@
-rich==13.7.0
-python-dotenv==1.0.0
-yara-python==4.3.1
-requests==2.31.0
+# Core scanning
+yara-python==4.3.1      # YARA signature scanning engine
+rich==13.7.0            # Nice terminal output (CLI)
+python-dotenv==1.0.0    # .env loading (e.g. VIRUSTOTAL_API_KEY)
+requests==2.31.0        # VirusTotal API (CLI only; optional without API key)
+
+# Local web UI
+Flask>=3.0              # Local dashboard (127.0.0.1 only)
+
+# Development
+# pytest>=7.0           # uncomment to run tests/

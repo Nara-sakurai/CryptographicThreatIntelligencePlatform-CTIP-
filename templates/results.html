@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+
+{% block content %}
+{% if error %}
+    <section class="card">
+        <h2>Scan could not run</h2>
+        <p>See the highlighted message above for details, then go back and try again.</p>
+        <a class="btn" href="{{ url_for('index') }}">Back to scan</a>
+    </section>
+{% else %}
+    {% set cls = result.classification or {} %}
+    {% set yara = result.yara_data or {} %}
+    {% set ent = result.entropy_data or {} %}
+    {% set level = cls.threat_level or 'UNKNOWN' %}
+    {% set level_class = 'lvl-' + (level | lower) %}
+
+    <section class="card">
+        <div class="result-headline {{ level_class }}">
+            <div>
+                <div class="result-file">{{ uploaded_name or (result.filepath | basename) }}</div>
+                <div class="result-rules muted">Rules: <code>{{ rules_path or 'none' }}</code></div>
+            </div>
+            <span class="status-badge {{ level_class }}">{{ level }}</span>
+        </div>
+
+        <div class="result-grid">
+            <div class="metric">
+                <span class="metric-label">Threat score</span>
+                <span class="metric-value">{{ cls.score | default(0) }} / 1.0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Confidence</span>
+                <span class="metric-value">{{ cls.confidence | default('LOW') }}</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Entropy</span>
+                <span class="metric-value">{{ '%.2f'|format(ent.entropy | default(0)) }}</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Behaviour</span>
+                <span class="metric-value">{{ ent.behavior | default('N/A') }}</span>
+            </div>
+        </div>
+
+        {% if cls.indicators %}
+        <div class="indicators">
+            <h3>Detection indicators</h3>
+            <ul>
+                {% for ind in cls.indicators %}
+                    <li>{{ ind }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if ent.sha256 is defined or (result.vt_data and result.vt_data.sha256) %}
+        <div class="indicators">
+            <h3>Hashes</h3>
+            {% set sh = result.vt_data or {} %}
+            <p class="muted"><strong>SHA256:</strong> <code>{{ sh.sha256 or 'N/A' }}</code></p>
+            <p class="muted"><strong>MD5:</strong> <code>{{ sh.md5 or 'N/A' }}</code></p>
+
+            {% set vtc = sh.vt_check or {} %}
+            {% if vtc.enabled %}
+                {# VirusTotal lookup was performed (hash only, never the file) #}
+                <div class="vt-block">
+                    <h4>VirusTotal (SHA256 lookup)</h4>
+                    {% if vtc.error %}
+                        <p class="muted">{{ vtc.error }}.</p>
+                    {% elif vtc.found %}
+                        <p>
+                            <span class="pill {% if vtc.malicious %}pill-high{% elif vtc.suspicious %}pill-medium{% else %}pill-clean{% endif %}">
+                                {% if vtc.malicious %}{{ vtc.malicious }} engine(s) flagged malicious{% elif vtc.suspicious %}{{ vtc.suspicious }} suspicious{% else %}No detections{% endif %}
+                            </span>
+                            <span class="muted">out of {{ vtc.total_engines or 0 }} engines</span>
+                        </p>
+                    {% else %}
+                        <p class="muted">
+                            {{ vtc.message or 'Hash not found in VirusTotal database' }}.
+                        </p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p class="muted">VirusTotal lookup off (local scan only).</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Signature matches</h2>
+        {% if yara.error %}
+            <p class="warning">Signature scan unavailable: {{ yara.error }}</p>
+        {% elif yara.found and yara.matches %}
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Rule</th>
+                        <th>Status</th>
+                        <th>Severity</th>
+                        <th>Tags</th>
+                        <th>Description / Metadata</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in yara.matches %}
+                    <tr>
+                        <td class="mono">{{ m.rule }}</td>
+                        <td><span class="pill pill-matched">Matched</span></td>
+                        <td>
+                            {% if m.severity == 'High' %}
+                                <span class="pill pill-high">High</span>
+                            {% else %}
+                                <span class="pill pill-medium">Medium</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if m.tags %}
+                                {% for t in m.tags %}<span class="tag">{{ t }}</span>{% endfor %}
+                            {% else %}
+                                <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ m.description or '—' }}
+                            {% if m.meta %}
+                                <details class="meta">
+                                    <summary>metadata</summary>
+                                    <table class="meta-table">
+                                        {% for k, v in m.meta.items() %}
+                                            <tr><td class="mono">{{ k }}</td><td>{{ v }}</td></tr>
+                                        {% endfor %}
+                                    </table>
+                                </details>
+                            {% endif %}
+                        </td>
+                        <td class="muted">{{ m.source or 'unknown' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="ok">No YARA signatures matched (loaded rules: {{ yara.loaded_rules | default(0) }}).</p>
+        {% endif %}
+    </section>
+
+    <p><a class="btn" href="{{ url_for('index') }}">Scan another file</a></p>
+{% endif %}
+{% endblock %}

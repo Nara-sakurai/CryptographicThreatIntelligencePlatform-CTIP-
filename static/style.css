@@ -1,0 +1,236 @@
+/* TriFusion - local dashboard styles. Plain CSS, no frameworks/CDNs. */
+
+:root {
+    --bg: #f4f6fb;
+    --card-bg: #ffffff;
+    --text: #1f2933;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --primary: #2c5282;
+    --primary-dark: #234067;
+    --clean: #2f855a;
+    --suspicious: #b7791f;
+    --malicious: #c53030;
+    --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+/* Header ------------------------------------------------------------------- */
+.site-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 1.25rem 0;
+    box-shadow: var(--shadow);
+}
+.site-header .brand { margin: 0; font-size: 1.5rem; }
+.site-header .tagline { margin: 0.15rem 0 0; opacity: 0.85; font-size: 0.9rem; }
+
+/* Warning banner ----------------------------------------------------------- */
+.banner {
+    background: #fff7ed;
+    border-bottom: 1px solid #fdba74;
+    color: #7c2d12;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+}
+.banner code { background: #ffedd5; padding: 0.05rem 0.3rem; border-radius: 4px; }
+
+/* Main layout -------------------------------------------------------------- */
+main { padding: 1.5rem 0 3rem; }
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+.card h2 { margin-top: 0; font-size: 1.25rem; color: var(--primary-dark); }
+.card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+
+.muted { color: var(--muted); font-size: 0.9rem; }
+.mono, code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 0.9em; }
+
+/* Forms -------------------------------------------------------------------- */
+.field { margin-bottom: 1.25rem; }
+.field label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.95rem; }
+.field input[type="text"],
+.field input[type="file"],
+.field select {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+}
+.field small { display: block; margin-top: 0.3rem; }
+
+.btn {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 0.65rem 1.3rem;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn:hover { background: var(--primary-dark); }
+
+/* Flash messages ----------------------------------------------------------- */
+.flash-list { list-style: none; padding: 0; margin: 0 0 1rem; }
+.flash {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-size: 0.92rem;
+}
+
+/* Results - headline ------------------------------------------------------- */
+.result-headline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.result-file { font-size: 1.15rem; font-weight: 700; word-break: break-all; }
+.result-rules { margin-top: 0.2rem; }
+
+.status-badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.03em;
+}
+.lvl-malicious, .pill-high { background: var(--malicious); }
+.lvl-suspicious { background: var(--suspicious); }
+.lvl-clean { background: var(--clean); }
+.status-badge.lvl-unknown { background: var(--muted); }
+
+/* Results - metrics -------------------------------------------------------- */
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.metric {
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+.metric-label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.metric-value { display: block; font-size: 1.05rem; font-weight: 700; margin-top: 0.2rem; }
+
+/* Indicators --------------------------------------------------------------- */
+.indicators { margin-top: 1rem; }
+.indicators ul { margin: 0.3rem 0; padding-left: 1.2rem; }
+.indicators li { margin: 0.2rem 0; }
+
+/* Results table ------------------------------------------------------------ */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+.results-table th,
+.results-table td {
+    text-align: left;
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+.results-table thead th {
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.results-table tbody tr:hover { background: #f9fafb; }
+
+.pill {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+}
+.pill-matched { background: var(--primary); }
+.pill-medium { background: var(--suspicious); }
+
+.tag {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 0.05rem 0.45rem;
+    margin: 0.1rem 0.15rem 0.1rem 0;
+    font-size: 0.78rem;
+    font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+details.meta { margin-top: 0.4rem; }
+details.meta summary { cursor: pointer; color: var(--primary); font-size: 0.8rem; }
+.meta-table { border-collapse: collapse; margin-top: 0.3rem; font-size: 0.82rem; }
+.meta-table td { padding: 0.15rem 0.5rem 0.15rem 0; border-bottom: 1px dashed var(--border); }
+
+.ok { color: var(--clean); font-weight: 600; }
+.warning { color: var(--malicious); font-weight: 600; }
+
+/* Checkbox row (VirusTotal opt-in) ----------------------------------------- */
+.field-check { background: #f9fafb; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; }
+.check { display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; }
+.check input[type="checkbox"] { margin-top: 0.25rem; transform: scale(1.2); }
+.check span { line-height: 1.4; }
+
+/* VirusTotal result block --------------------------------------------------- */
+.vt-block { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.vt-block h4 { margin: 0 0 0.4rem; font-size: 0.92rem; color: var(--primary-dark); }
+.pill-clean { background: var(--clean); }
+
+/* Footer ------------------------------------------------------------------- */
+.site-footer {
+    border-top: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .result-headline { flex-direction: column; align-items: flex-start; }
+    .results-table { font-size: 0.82rem; }
+}
